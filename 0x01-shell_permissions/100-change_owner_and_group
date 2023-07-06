@@ -1,2 +1,2 @@
 #!/bin/bash
-chown -hR Benny:staff
+chown -hR Benny : staff
