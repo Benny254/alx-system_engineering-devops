@@ -1,10 +1,35 @@
 #!/usr/bin/env bash
 
-# Check if the number of arguments is less than 4
-if [ $# -lt 4 ]; then
-	echo "Usage: $0 PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+# Check if the correct number of arguments is provided
+if [ "$#" -lt 4 ]; then
+	printf "Usage: %s PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY\n" "$0"
+	exit 1
+fi
+
+# Assign meaningful names to the script parameters
+file_path="$1"
+server_ip="$2"
+username="$3"
+ssh_key="$4"
+
+# Check if the file exists
+if [ ! -f "$file_path" ]; then
+	printf "Error: File '%s' does not exist.\n" "$file_path"
 	exit 1
 fi
 
 # Transfer the file to the server using scp
-scp -o StrictHostKeyChecking=no -i "$4" "$1" "$3"@"$2":~/
+if [ $# -ge 4 ]; then
+	scp -o StrictHostKeyChecking=no -i "$ssh_key" "$file_path" "$username@$server_ip":~/
+else
+	scp -o StrictHostKeyChecking=no "$file_path" "$username@$server_ip":~/
+fi
+
+# Check if the scp command was successful
+if [ $? -ne 0 ]; then
+	printf "Error: File transfer failed.\n"
+	exit 1
+fi
+
+printf "File '%s' successfully transferred to %s@%s:~/\n" "$(basename "$file_path")" "$username" "$server_ip"
+
