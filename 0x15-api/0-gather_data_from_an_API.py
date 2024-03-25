@@ -1,48 +1,25 @@
 #!/usr/bin/python3
-import json
+""" Script that uses JSONPlaceholder API to get information about employee """
 import requests
 import sys
 
-def get_employee_todo_progress(employee_id):
-        url = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
-            
-                # Get TODO list for the employee
-                    response = requests.get(url)
-                        todos = response.json()
-                            
-                                # Get user details
-                                    user_response = requests.get(f"https://jsonplaceholder.typicode.com/users/{employee_id}")
-                                        user = user_response.json()
-                                            
-                                                # Extract employee name
-                                                    employee_name = user['name']
-                                                        
-                                                            # Initialize variables
-                                                                total_tasks = len(todos)
-                                                                    completed_tasks = 0
-                                                                        completed_task_titles = []
-                                                                            
-                                                                                # Count completed tasks and collect titles
-                                                                                    for todo in todos:
-                                                                                                if todo['completed']:
-                                                                                                                completed_tasks += 1
-                                                                                                                            completed_task_titles.append(todo['title'])
-                                                                                                                                
-                                                                                                                                    # Display progress
-                                                                                                                                        print(f"Employee {employee_name} is done with tasks ({completed_tasks}/{total_tasks}):")
-                                                                                                                                            for title in completed_task_titles:
-                                                                                                                                                        print(f"\t{title}")
 
-                                                                                                                                                        if __name__ == "__main__":
-                                                                                                                                                                if len(sys.argv) != 2:
-                                                                                                                                                                            print("Usage: python script.py employee_id")
-                                                                                                                                                                                    sys.exit(1)
-                                                                                                                                                                                        
-                                                                                                                                                                                            try:
-                                                                                                                                                                                                        employee_id = int(sys.argv[1])
-                                                                                                                                                                                                            except ValueError:
-                                                                                                                                                                                                                        print("Employee ID must be an integer.")
-                                                                                                                                                                                                                                sys.exit(1)
-                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                        get_employee_todo_progress(employee_id)
+if __name__ == "__main__":
+        url = 'https://jsonplaceholder.typicode.com/'
 
+            user = '{}users/{}'.format(url, sys.argv[1])
+                res = requests.get(user)
+                    json_o = res.json()
+                        print("Employee {} is done with tasks".format(json_o.get('name')), end="")
+
+                            todos = '{}todos?userId={}'.format(url, sys.argv[1])
+                                res = requests.get(todos)
+                                    tasks = res.json()
+                                        l_task = []
+                                            for task in tasks:
+                                                        if task.get('completed') is True:
+                                                                        l_task.append(task)
+
+                                                                            print("({}/{}):".format(len(l_task), len(tasks)))
+                                                                                for task in l_task:
+                                                                                            print("\t {}".format(task.get("title")))
